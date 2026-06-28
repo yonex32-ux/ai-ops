@@ -1,0 +1,3 @@
+date,topic,video_title,url,why_watch,status,notebook_target,notes
+"2026-06-28","ai_workflows","NotebookLM integration sample","https://www.youtube.com/watch?v=example","Test workflow","queued","YT_AI_Workflows","sample row"
+"2026-06-28","ai_workflows","YouTube learning candidate","https://youtu.be/QIlzqc7DO7c?si=YLM6zYvYQA_ghXql","NotebookLMで業務転用可能なAI活用法を抽出するため","queued","YT_AI_Workflows","user provided url"

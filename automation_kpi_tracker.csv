@@ -1,0 +1,6 @@
+date,priority,workflow,task_name,baseline_minutes,actual_minutes,minutes_saved,quality_score,mistake_prevented,adopted,next_action,notes
+2026-06-28,1,reply-triage,メール・サイボウズ返信下書き,25,10,15,4,true,yes,朝夕で継続し対象案件を増やす,業務メール候補と危険な下書きを切り分けて無送信で整理
+2026-06-28,2,file-intake,添付ファイル仕分け,30,12,18,4,true,yes,3通の添付を案件別に整理し曖昧案件を保留判断する,本文文脈込みで案件判定し南小国町と喜界町の混線リスクを検出
+2026-06-28,3,meeting-prep-followup,会議前後整理,,,,,,,,
+2026-06-28,4,new-project-kickoff,収集資料リストと初回協議段取り,,,,,,,,
+2026-06-28,5,budget-outsourcing-draft,実行予算と外注申請下書き,,,,,,,,

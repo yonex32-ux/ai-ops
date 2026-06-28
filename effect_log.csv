@@ -1,0 +1,4 @@
+date,task_type,task_name,estimated_manual_minutes,actual_minutes,minutes_saved,quality_score,mistake_prevented,workflow,plugins_used,notes
+"2026-06-28","setup","AI ops starter setup","45","20","25","4","True","Ops setup","Codex","Created measurement and workflow templates"
+"2026-06-28","triage","reply-triage first live run","25","10","15","4","True","reply-triage","Gmail,Codex","Reviewed critical-path-related business emails, identified no-send reply candidates, flagged stale drafts and attachment-processing actions."
+"2026-06-28","triage","file-intake email-context triage","30","12","18","4","True","file-intake","Gmail,Codex","Classified three attachment-heavy business emails, identified one ambiguous cross-project attachment set, and proposed exact routing before any file movement."
