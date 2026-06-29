@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI社員 監視ダッシュボード</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #1a2029;
+    --panel-2: #222b36;
+    --border: #2c3744;
+    --text: #e6edf3;
+    --muted: #8b98a5;
+    --working: #3fb950;
+    --review: #d29922;
+    --idle: #6e7681;
+    --done: #58a6ff;
+    --accent: #58a6ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #161b22, var(--bg));
+  }
+  header h1 { font-size: 20px; margin: 0; }
+  header .meta { color: var(--muted); font-size: 13px; }
+  header .clock { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+  main { padding: 24px 28px; max-width: 1200px; margin: 0 auto; }
+  h2 { font-size: 15px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 28px 0 12px; }
+
+  /* KPI strip */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .kpi { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .kpi .num { font-size: 26px; font-weight: 700; }
+  .kpi .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Employee cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .card .top { display: flex; align-items: center; gap: 12px; }
+  .card .icon { font-size: 26px; width: 44px; height: 44px; display: grid; place-items: center; background: var(--panel-2); border-radius: 10px; flex: none; }
+  .card .who { flex: 1; min-width: 0; }
+  .card .name { font-weight: 700; font-size: 16px; }
+  .card .role { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card .task { font-size: 14px; background: var(--panel-2); border-radius: 8px; padding: 9px 11px; }
+  .card .task .t-label { color: var(--muted); font-size: 11px; }
+  .card .foot { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+
+  .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; flex: none; }
+  .badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .badge.working { color: var(--working); background: rgba(63,185,80,.12); }
+  .badge.review  { color: var(--review);  background: rgba(210,153,34,.12); }
+  .badge.idle    { color: var(--idle);    background: rgba(110,118,129,.15); }
+  .badge.done    { color: var(--done);    background: rgba(88,166,255,.12); }
+  .badge.working .dot { background: var(--working); animation: pulse 1.4s infinite; }
+  .badge.review .dot  { background: var(--review); }
+  .badge.idle .dot    { background: var(--idle); }
+  .badge.done .dot    { background: var(--done); }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(63,185,80,.6);} 70% { box-shadow: 0 0 0 7px rgba(63,185,80,0);} 100% { box-shadow: 0 0 0 0 rgba(63,185,80,0);} }
+
+  /* Activity feed */
+  .feed { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .feed .row { display: grid; grid-template-columns: 130px 120px auto; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--border); align-items: start; }
+  .feed .row:last-child { border-bottom: none; }
+  .feed .row:nth-child(even) { background: rgba(255,255,255,.015); }
+  .feed .time { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .feed .emp { font-size: 13px; font-weight: 600; }
+  .feed .what .task { font-size: 14px; }
+  .feed .what .detail { font-size: 12px; color: var(--muted); }
+  footer { color: var(--muted); font-size: 12px; text-align: center; padding: 24px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>🤖 AI社員 監視ダッシュボード</h1>
+    <div class="meta">生成日時: <span id="generated">__GENERATED__</span></div>
+  </div>
+  <div class="clock" id="clock">--:--:--</div>
+</header>
+
+<main>
+  <h2>今日の効果サマリー</h2>
+  <div class="kpis" id="kpis"></div>
+
+  <h2>AI社員の稼働状況</h2>
+  <div class="cards" id="cards"></div>
+
+  <h2>稼働ログ（新しい順）</h2>
+  <div class="feed" id="feed"></div>
+</main>
+
+<footer>
+  データ更新は <code>build_dashboard.ps1</code> を再実行してください。稼働イベントの追加は <code>record_activity.ps1</code> から。
+</footer>
+
+<script>
+const ACTIVITIES = /*__ACTIVITIES__*/[];
+const EFFECTS = /*__EFFECTS__*/[];
+
+const ROSTER = [
+  { workflow: "reply-triage",            name: "返信担当",   icon: "✉️", role: "メール・サイボウズ返信下書き" },
+  { workflow: "file-intake",             name: "仕分け担当", icon: "🗂️", role: "添付ファイルの案件仕分け" },
+  { workflow: "meeting-prep-followup",   name: "会議担当",   icon: "📝", role: "会議前ブリーフ・会議後タスク化" },
+  { workflow: "new-project-kickoff",     name: "立ち上げ担当", icon: "🚀", role: "新規案件の資料リスト・段取り" },
+  { workflow: "budget-outsourcing-draft", name: "申請担当",   icon: "📑", role: "実行予算・外注・変更申請の下書き" },
+];
+
+const STATUS = {
+  "稼働中":   { cls: "working" },
+  "確認待ち": { cls: "review" },
+  "待機":     { cls: "idle" },
+  "完了":     { cls: "done" },
+};
+
+function statusCls(s) { return (STATUS[s] || STATUS["待機"]).cls; }
+
+function badge(status) {
+  const cls = statusCls(status);
+  return `<span class="badge ${cls}"><span class="dot"></span>${status || "待機"}</span>`;
+}
+
+// --- KPI summary from EFFECTS ---
+function renderKpis() {
+  const n = EFFECTS.length;
+  const sum = (k) => EFFECTS.reduce((a, r) => a + (parseInt(r[k], 10) || 0), 0);
+  const savedTotal = sum("minutes_saved");
+  const quality = EFFECTS.filter(r => (parseInt(r.quality_score, 10) || 0) >= 4).length;
+  const mistakes = EFFECTS.filter(r => String(r.mistake_prevented).toLowerCase() === "true").length;
+  const running = ROSTER.filter(e => latestFor(e.workflow)?.status === "稼働中").length;
+
+  const items = [
+    { num: running, lbl: "稼働中のAI社員" },
+    { num: savedTotal + "分", lbl: "累計の短縮時間" },
+    { num: n, lbl: "記録済みタスク" },
+    { num: quality, lbl: "品質スコア4以上" },
+    { num: mistakes, lbl: "ミス予防の件数" },
+  ];
+  document.getElementById("kpis").innerHTML = items.map(i =>
+    `<div class="kpi"><div class="num">${i.num}</div><div class="lbl">${i.lbl}</div></div>`).join("");
+}
+
+// latest activity row for a given workflow
+function latestFor(workflow) {
+  const rows = ACTIVITIES.filter(a => a.workflow === workflow);
+  if (!rows.length) return null;
+  return rows.slice().sort((a, b) => a.timestamp.localeCompare(b.timestamp)).at(-1);
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function renderCards() {
+  document.getElementById("cards").innerHTML = ROSTER.map(emp => {
+    const last = latestFor(emp.workflow);
+    const status = last ? last.status : "待機";
+    const task = last ? last.task : "本日の稼働なし";
+    const detail = last ? last.detail : "";
+    const time = last ? last.timestamp : "—";
+    const count = ACTIVITIES.filter(a => a.workflow === emp.workflow).length;
+    return `
+      <div class="card">
+        <div class="top">
+          <div class="icon">${emp.icon}</div>
+          <div class="who">
+            <div class="name">${esc(emp.name)}</div>
+            <div class="role">${esc(emp.role)}</div>
+          </div>
+          ${badge(status)}
+        </div>
+        <div class="task">
+          <div class="t-label">現在のタスク</div>
+          ${esc(task)}
+          ${detail ? `<div class="role" style="margin-top:4px">${esc(detail)}</div>` : ""}
+        </div>
+        <div class="foot"><span>最終更新: ${esc(time)}</span><span>本日の稼働 ${count} 件</span></div>
+      </div>`;
+  }).join("");
+}
+
+function renderFeed() {
+  const rows = ACTIVITIES.slice().sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+  document.getElementById("feed").innerHTML = rows.map(a => `
+    <div class="row">
+      <div class="time">${esc(a.timestamp)}</div>
+      <div class="emp">${esc(a.employee)} ${badge(a.status)}</div>
+      <div class="what">
+        <div class="task">${esc(a.task)}</div>
+        ${a.detail ? `<div class="detail">${esc(a.detail)}</div>` : ""}
+      </div>
+    </div>`).join("") || `<div class="row"><div class="what">稼働ログがありません。</div></div>`;
+}
+
+function tickClock() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, "0");
+  document.getElementById("clock").textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+
+renderCards();
+renderKpis();
+renderFeed();
+tickClock();
+setInterval(tickClock, 1000);
+</script>
+</body>
+</html>

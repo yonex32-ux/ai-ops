@@ -41,6 +41,12 @@ This folder is the local seed for a lightweight AI operations system.
   Appends one measured work item to the CSV.
 - `summarize_ai_effect.ps1`
   Reads the CSV and outputs simple KPIs.
+- `ai_monitor_dashboard.md`
+  How to watch AI employees while they work (live monitoring dashboard).
+- `record_activity.ps1`
+  Logs one AI-employee activity event (working / waiting / done) to `activity_log.csv`.
+- `build_dashboard.ps1`
+  Builds `ai_monitor_dashboard.html` from the activity and effect logs.
 
 ## How to use
 
@@ -50,6 +56,15 @@ This folder is the local seed for a lightweight AI operations system.
 4. When a task ends, run `record_ai_effect.ps1`.
 5. At the end of the week, run `summarize_ai_effect.ps1`.
 6. Copy the results into `weekly_review.md` and decide what to expand, fix, or stop.
+
+## Monitoring AI employees
+
+To watch what each AI employee is doing in near real time:
+
+1. Log activity events as work starts, waits, or finishes:
+   `\.record_activity.ps1 -Employee "返信担当" -Workflow "reply-triage" -Status "稼働中" -Task "朝の返信トリアージ"`
+2. Build and open the dashboard: `.\build_dashboard.ps1 -Open`
+3. See `ai_monitor_dashboard.md` for the full guide.
 
 ## What to measure
 
