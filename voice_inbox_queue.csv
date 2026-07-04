@@ -1,0 +1,2 @@
+date,source,duration_min,topic,transcript_location,context_summary,judgment_signal,routed_to,status,notes
+"2026-07-03","pocket_memo","","","","","","","received","昨日の音声メモ。文字起こし場所が未設定のため extract 未実施。transcript_location を埋めれば抽出可能。"

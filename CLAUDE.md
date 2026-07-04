@@ -28,6 +28,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # YouTube 学習候補を youtube_learning_queue.csv に追記
 .\record_youtube_candidate.ps1 -Date ... -Topic ... -VideoTitle ... -Url ... -WhyWatch ...
+
+# 音声メモを voice_inbox_queue.csv に追記（受信ごとに実行）
+.\record_voice_note.ps1 -Date 2026-07-03 -Source "pocket_memo" -Topic "..." `
+  -TranscriptLocation "Obsidian:..." -Status "received" -Notes "..."
 ```
 
 ## Architecture: 計測ループが中心
@@ -47,6 +51,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `github_linear_circleback_setup.md` — 初期セットアップ手順
 - `prompt_templates.md` / `automation_prompt_pack.md` — 再利用プロンプト
 - `notebooklm_youtube_workflow.md` + `youtube_learning_queue.csv` — 学習素材の取り込みフロー
+- `voice_inbox_workflow.md` + `voice_inbox_queue.csv` — 音声メモの取り込み→文脈抽出→振り分けフロー（音声は入力チャネル。既存 workflow に流し込む）
+- `judgment_axis_profile.md` — 米谷さんの判断軸を書き残す長期記憶（音声抽出・週次レビューから追記）
 
 ## 実行時の判断ルール（automation_priority_roadmap.md より）
 
