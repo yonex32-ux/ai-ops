@@ -57,6 +57,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Skills
 
+- `/p` — マイタスクの**プライベートリスト**を一覧し、選んだタスクを実行する。`/p 296` のように MYT 番号で絞り込める。実行は下書き止まり（送信・注文・予約確定は本人）。
 - `/memory-dream` — 記憶階層（この CLAUDE.md を含む記憶ファイル群）を定期的に再編し、重複・矛盾・陳腐化を除去する consolidation 手順。20〜30 セッション蓄積時や大規模改編後に実行する。
 
 ## Conventions
